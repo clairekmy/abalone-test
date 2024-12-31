@@ -1,36 +1,27 @@
 import pandas as pd
-import dash
-from dash import dcc, html
+import streamlit as st
 import plotly.express as px
 
-# Load the Abalone dataset and assign column names
+# Access the dataset path from Streamlit secrets
+dataset_path = st.secrets["datasets"]["abalone_path"]
+
+# Load the dataset
 columns = [
     "Sex", "Length", "Diameter", "Height", "WholeWeight", 
     "ShuckedWeight", "VisceraWeight", "ShellWeight", "Rings"
 ]
-df = pd.read_csv('abalone.data', header=None, names=columns)
+df = pd.read_csv(dataset_path, header=None, names=columns)
 
-# Initialize Dash app
-app = dash.Dash(__name__)
+# Streamlit UI
+st.title("Abalone Dataset Visualization")
 
-# Create a scatter plot using Plotly Express
+# Scatter plot using Plotly
 fig = px.scatter(
     df,
-    x="Rings",  # Replace with a column name from the dataset
-    y="Length",  # Replace with another column name from the dataset
-    color="Sex",  # Replace with a categorical column (if available)
+    x="Rings",  # Age proxy
+    y="Length",  # Feature to visualize
+    color="Sex",  # Grouping by categorical variable
     title="Abalone Dataset Visualization",
-    labels={"Rings": "Age Rings", "Length": "Shell Length"},
+    labels={"Rings": "Age (Rings)", "Length": "Length (mm)"},
 )
-
-# Define the layout of the Dash app
-app.layout = html.Div([
-    html.H1("Abalone Dataset Dashboard"),
-    dcc.Graph(id="abalone-scatter-plot", figure=fig)
-])
-
-# Run the app
-if __name__ == '__main__':
-    app.run_server(debug= False)
-
-
+st.plotly_chart(fig)
